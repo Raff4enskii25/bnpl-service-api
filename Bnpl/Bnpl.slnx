@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Bnpl.Api/Bnpl.Api.csproj" />
+  <Project Path="Bnpl.Domain/Bnpl.Domain.csproj" />
+  <Project Path="Bnpl.UnitTests/Bnpl.UnitTests.csproj" />
+</Solution>
