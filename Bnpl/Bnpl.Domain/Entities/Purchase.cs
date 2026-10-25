@@ -19,7 +19,7 @@ namespace Bnpl.Domain.Entities
         {
             if (amount < MinimumAmount) throw new ArgumentOutOfRangeException(nameof(amount), $"Amount must be greater than or equal to {MinimumAmount}.");
             if (description == null) throw new ArgumentNullException(nameof(description));
-            if (description.IsWhiteSpace()) throw new ArgumentException(nameof(description));
+            if (description.IsWhiteSpace()) throw new ArgumentException("The purchase description must not consist of spaces.", nameof(description));
             if (description.Length > DescriptionMaxLength) throw new ArgumentOutOfRangeException(nameof(description), $"Description length must not exceed {DescriptionMaxLength} characters."); 
 
             CustomerId = customerId;
