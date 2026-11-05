@@ -17,7 +17,7 @@ namespace Bnpl.Domain.Entities
 
         public Installment(int installmentPlanId, int installmentNumber, decimal amount, DateOnly dueDate)
         {
-            if(amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be greater than 100.");
+            if(amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be greater than 0.");
 
             InstallmentPlanId = installmentPlanId;
             InstallmentNumber = installmentNumber;
@@ -39,7 +39,10 @@ namespace Bnpl.Domain.Entities
             if(Status == InstallmentStatus.Pending)
                 Status = InstallmentStatus.Overdue;
             
-            if(Status == InstallmentStatus.Overdue) { }
+            if (Status == InstallmentStatus.Overdue) { }
+
+            if (Status == InstallmentStatus.Paid)
+                throw new InvalidOperationException("A payment cannot be marked as overdue when it is payed.");
         }
     }
 }
