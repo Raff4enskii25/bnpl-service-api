@@ -12,10 +12,11 @@ namespace Bnpl.Domain.Entities
         public DateTimeOffset AccrualDate { get; private set; }
         public Installment Installment { get; private set; }
 
-        public Penalty(decimal amount, PenaltyReason reason, DateTimeOffset accrualDate)
+        public Penalty(int installmentId, decimal amount, PenaltyReason reason, DateTimeOffset accrualDate)
         {
             if(amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be greater than 0.");
 
+            InstallmentId = installmentId;
             Amount = amount;
             Reason = reason;
             AccrualDate = accrualDate;
