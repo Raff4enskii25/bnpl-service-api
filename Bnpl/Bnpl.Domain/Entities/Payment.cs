@@ -11,10 +11,11 @@ namespace Bnpl.Domain.Entities
         public DateTimeOffset PaidAt { get; private set; }
         public Installment Installment { get; private set; }
 
-        public Payment(decimal amount, DateTimeOffset paidAt)
+        public Payment(int installmentId, decimal amount, DateTimeOffset paidAt)
         {
             if(amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount), $"Amount must be greater than 0.");
 
+            InstallmentId = installmentId;
             Amount = amount;
             PaidAt = paidAt;
         }
