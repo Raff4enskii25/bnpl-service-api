@@ -1,9 +1,11 @@
 ﻿using System;
+using Bnpl.Domain.Validation;
 
 namespace Bnpl.Domain.Entities
 {
     public class Purchase
     {
+        public const decimal MaximumAmount = 1_000_000;
         public const decimal MinimumAmount = 100;
         public const int DescriptionMaxLength = 500;
 
@@ -17,10 +19,12 @@ namespace Bnpl.Domain.Entities
 
         public Purchase(int customerId, decimal amount, string? description, DateTimeOffset createdAt)
         {
-            if (amount < MinimumAmount) throw new ArgumentOutOfRangeException(nameof(amount), $"Amount must be greater than or equal to {MinimumAmount}.");
+            if(amount > MaximumAmount) throw new ArgumentOutOfRangeException(nameof(amount), $"Amount must be less than or equal to {MaximumAmount}.");
+            if(amount < MinimumAmount) throw new ArgumentOutOfRangeException(nameof(amount), $"Amount must be greater than or equal to {MinimumAmount}.");
+            if(!AmountValidation.HasAtMostTwoDecimalPlaces(amount)) throw new ArgumentOutOfRangeException(nameof(amount), "Amount must not have more than two decimal places.");
             if (description == null) throw new ArgumentNullException(nameof(description));
-            if (description.IsWhiteSpace()) throw new ArgumentException("The purchase description must not consist of spaces.", nameof(description));
-            if (description.Length > DescriptionMaxLength) throw new ArgumentOutOfRangeException(nameof(description), $"Description length must not exceed {DescriptionMaxLength} characters."); 
+            if(description.IsWhiteSpace()) throw new ArgumentException("The purchase description must not consist of spaces.", nameof(description));
+            if(description.Length > DescriptionMaxLength) throw new ArgumentOutOfRangeException(nameof(description), $"Description length must not exceed {DescriptionMaxLength} characters."); 
 
             CustomerId = customerId;
             Amount = amount;

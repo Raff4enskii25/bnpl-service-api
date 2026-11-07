@@ -7,12 +7,13 @@ namespace Bnpl.UnitTests.Entities
     {
         private static readonly DateTimeOffset _testDate = new DateTimeOffset(2025, 10, 25, 0, 0, 0, TimeSpan.Zero);
 
-        [Fact]
-        public void Purchase_ValidData_CreateSuccessfully()
+        [Theory]
+        [InlineData(100)]
+        [InlineData(1_000_000)]
+        public void Purchase_ValidData_CreateSuccessfully(decimal amount)
         {
             // Arrange
             int customerId = 1;
-            decimal amount = Purchase.MinimumAmount;
             string description = "Test purchase";
             DateTimeOffset createdAt = _testDate;
 
@@ -30,6 +31,33 @@ namespace Bnpl.UnitTests.Entities
         [InlineData(0)]
         [InlineData(-5)]
         public void Purchase_IncorrectData_ThrowsArgumentOutOfRange(decimal amount)
+        {
+            // Arrange
+            int customerId = 1;
+            string description = "Test purchase";
+            DateTimeOffset createdAt = _testDate;
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Purchase(customerId, amount, description, createdAt));
+        }
+
+        [Fact]
+        public void Purchase_AmountJustAboveMaximum_ThrowsArgumentOutOfRange()
+        {
+            // Arrange
+            int customerId = 1;
+            decimal amount = Purchase.MaximumAmount + 0.01m;
+            string description = "Test purchase";
+            DateTimeOffset createdAt = _testDate;
+            
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Purchase(customerId, amount, description, createdAt));
+        }
+
+        [Theory]
+        [InlineData(100.025)]
+        [InlineData(100.029)]
+        public void Purchase_AmountWithMoreThanTwoDecimalPlaces_ThrowsArgumentOutOfRange(decimal amount)
         {
             // Arrange
             int customerId = 1;
