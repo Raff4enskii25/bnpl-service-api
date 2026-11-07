@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Serilog;
 
 
 namespace Bnpl.Api
@@ -8,31 +9,53 @@ namespace Bnpl.Api
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            builder.Services.AddDbContext<Data.AppDbContext>(options =>
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .CreateLogger();
+            try
             {
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
+                var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
-            builder.Services.AddSwaggerGen();
+                builder.Services.AddSerilog((services, configuration) => configuration
+                    .ReadFrom.Configuration(builder.Configuration)
+                    .ReadFrom.Services(services));
 
-            var app = builder.Build();
+                builder.Services.AddDbContext<Data.AppDbContext>(options =>
+                {
+                    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+                });
 
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                builder.Services.AddControllers();
+                builder.Services.AddSwaggerGen();
+
+                var app = builder.Build();
+
+                app.UseSerilogRequestLogging();
+
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                }
+
+                app.UseHttpsRedirection();
+
+                app.UseAuthorization();
+
+                app.MapControllers();
+
+                app.Run();
             }
 
-            app.UseHttpsRedirection();
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application start-up failed");
+            }
 
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }
