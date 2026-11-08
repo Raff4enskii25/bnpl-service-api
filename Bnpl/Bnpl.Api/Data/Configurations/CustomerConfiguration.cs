@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Bnpl.Domain.Entities;
+using Bnpl.Domain.Validation;
 
 namespace Bnpl.Api.Data.Configurations
 {
@@ -13,7 +14,7 @@ namespace Bnpl.Api.Data.Configurations
                 .HasMaxLength(Customer.MaxNameLength);
             builder.Property(c => c.Email)
                 .IsRequired()
-                .HasMaxLength(Customer.MaxEmailLength);
+                .HasMaxLength(EmailNormalization.MaxLength);
             builder.HasIndex(c => c.Email)
                 .IsUnique();
             builder.Property(c => c.CreatedAt)

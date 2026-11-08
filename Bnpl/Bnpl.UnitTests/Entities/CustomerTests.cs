@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using Bnpl.Domain.Entities;
+using Bnpl.Domain.Validation;
 
 namespace Bnpl.UnitTests.Entities
 {
@@ -24,6 +25,7 @@ namespace Bnpl.UnitTests.Entities
             Assert.Equal(createdAt, customer.CreatedAt);
         }
 
+
         [Fact]
         public void Customer_NameNull_ThrowsArgumentNull()
         {
@@ -36,6 +38,7 @@ namespace Bnpl.UnitTests.Entities
             Assert.Throws<ArgumentNullException>(() => new Customer(name, email, createdAt));
         }
 
+
         [Fact]
         public void Customer_EmailNull_ThrowsArgumentNull()
         {
@@ -47,6 +50,7 @@ namespace Bnpl.UnitTests.Entities
             // Act && Assert
             Assert.Throws<ArgumentNullException>(() => new Customer(name, email, createdAt));
         }
+
 
         [Theory]
         [InlineData("")]
@@ -61,6 +65,7 @@ namespace Bnpl.UnitTests.Entities
             Assert.Throws<ArgumentException>(() => new Customer(name, email, createdAt));
         }
 
+
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
@@ -73,6 +78,7 @@ namespace Bnpl.UnitTests.Entities
             // Act && Assert
             Assert.Throws<ArgumentException>(() => new Customer(name, email, createdAt));
         }
+
 
         [Fact]
         public void Customer_NameTooLong_ThrowsArgumentOutOfRange()
@@ -92,12 +98,28 @@ namespace Bnpl.UnitTests.Entities
         {
             // Arrange
             string name = "Test name";
-            string email = new string('a', Customer.MaxEmailLength + 1);
+            string email = new string('a', EmailNormalization.MaxLength + 1);
             DateTimeOffset createdAt = _testDate;
 
             // Act && Assert
             Assert.Throws<ArgumentOutOfRangeException>(() => new Customer(name, email, createdAt));
         }
+
+
+        [Theory]
+        [InlineData("em ail@mail.ru")]
+        [InlineData("em\tail@mail.ru")]
+        [InlineData("em\nail@mail.ru")]
+        public void Customer_SpacesWithinAEmail_ThrowsArgumentException(string email)
+        {
+            // Arrange
+            string name = "Test name";
+            DateTimeOffset createdAt = _testDate;
+
+            // Act && Assert
+            Assert.Throws<ArgumentException>(() => new Customer(name, email, createdAt));
+        }
+
 
         [Theory]
         [InlineData("    Test")]
@@ -116,10 +138,12 @@ namespace Bnpl.UnitTests.Entities
             Assert.Equal(example, customer.Name);
         }
 
+
         [Theory]
         [InlineData("    TEST@Test.com")]
         [InlineData("    TEST@test.com    ")]
-        [InlineData("    TE ST@te  st.com    ")]
+        [InlineData("\tTEST@Test.com")]
+        [InlineData("\nTEST@Test.com\n")]
         public void Customer_EmailWithSpaces_IsTrimmed(string email)
         {
             // Arrange
