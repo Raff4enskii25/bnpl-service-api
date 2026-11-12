@@ -1,3 +1,4 @@
+using Bnpl.Api.Exceptions;
 using Bnpl.Api.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -16,6 +17,9 @@ namespace Bnpl.Api
             {
                 var builder = WebApplication.CreateBuilder(args);
 
+                builder.Services.AddProblemDetails();
+                builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
                 builder.Services.AddSingleton<TimeProvider, MoscowTimeProvider>();
 
                 builder.Services.AddSerilog((services, configuration) => configuration
@@ -33,6 +37,8 @@ namespace Bnpl.Api
                 var app = builder.Build();
 
                 app.UseSerilogRequestLogging();
+
+                app.UseExceptionHandler();
 
                 if (app.Environment.IsDevelopment())
                 {
