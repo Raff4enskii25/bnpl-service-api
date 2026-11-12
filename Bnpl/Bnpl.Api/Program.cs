@@ -1,6 +1,5 @@
 using Bnpl.Api.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Serilog;
 
 
